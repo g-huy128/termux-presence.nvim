@@ -108,7 +108,7 @@ Full configuration with default values:
 require("termuxcord").setup({
   token = "your-token",               -- required, plugin stops with a warning if empty
   title = "Neovim",                   -- activity name (field `name`)
-  state = "Working on (%w)",          -- bottom line, supports %f (file) and %w (workspace)
+  state = "Workspace %w",          -- bottom line, supports %f (file) and %w (workspace)
   details = "Editing %f",             -- top line, supports %f and %w
   application_id = "1557774262285111366",
   repo_button_text = "Open Repository",
@@ -127,7 +127,7 @@ require("termuxcord").setup({
 | --- | ---- | ------- | ----------- |
 | `token` | `string` | `nil` | Discord user token. Required. |
 | `title` | `string` | `"Neovim"` | Activity name shown on the profile. |
-| `state` | `string` | `"Working on (%w)"` | Bottom line. `%f` = filename (`%:t`), `%w` = cwd basename (`:t`). Replaced by `idle_state` when idle. |
+| `state` | `string` | `"Workspace %w"` | Bottom line. `%f` = filename (`%:t`), `%w` = cwd basename (`:t`). Replaced by `idle_state` when idle. |
 | `details` | `string` | `"Editing %f"` | Top line. Same placeholders. Replaced by `"Idle"` when idle. |
 | `application_id` | `string` | `"1557774262285111366"` | App that hosts the image assets. |
 | `show_repo_button` | `boolean` | `false` | Show the repo button. Only appears when `isGitRepository(cwd)` and `[remote "origin"]` is found in `.git/config`. |
@@ -176,7 +176,7 @@ Termux style with repo button:
 require("termuxcord").setup({
   token = os.getenv("DISCORD_TOKEN"),
   title = "Termux",
-  state = "Working on (%w)",
+  state = "Workspace %w",
   details = "Editing %f",
   show_repo_button = true,
 })
