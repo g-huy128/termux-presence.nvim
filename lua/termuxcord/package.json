@@ -1,11 +1,11 @@
 {
-  "name": "termuxcord",
+  "name": "termux-presence.nvim",
   "version": "1.0.0",
   "description": "",
   "main": "rpc.js",
   "keywords": [],
   "author": "g-huy128",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "ws": "^8.18.0"
   }
