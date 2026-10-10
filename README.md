@@ -1,8 +1,8 @@
 # termux-presence.nvim
 
-Neovim Discord Rich Presence, optimized for **Termux / Linux**. Shows the file you're editing, the workspace, elapsed time, and language icons right on your Discord profile.
+Neovim Discord Rich Presence, optimized for Termux. Shows what you're editing, your workspace, language icons, and elapsed time directly on your Discord profile.
 
-> Built on the Discord Gateway WebSocket (`wss://gateway.discord.gg/?v=10`) through a single background Node.js process per Neovim session.
+Built on the Discord Gateway WebSocket (`wss://gateway.discord.gg/?v=10`) via a single background Node.js process per Neovim session.
 
 ## Table of contents
 
@@ -20,8 +20,9 @@ Neovim Discord Rich Presence, optimized for **Termux / Linux**. Shows the file y
 
 ## Features
 
-- Shows the current **filename** (`%f`) and **workspace** (`%w`).
-- Automatic language icons by file extension: `py`, `lua`, `css`, `html`, `c`, `js`. Unknown extensions fall back to **Idle**.
+- Shows the current **filename** (`%f`) and **workspace** (`%w`) in your Discord activity.
+- Automatic language icons by file extension. Built-in languages: `py`, `lua`, `luau`, `css`, `html`, `c`, `js`, `md`, `json`, `txt`, `sh`, `bat`, `bash`, `ts`, `tsx`, `jsx`, `rb`, `yaml`, `yml`, `cpp`, `cs`, `rs`, `ml`, `mli`, `swift`, `R`, `kt`, `kts`, `go`, `java`, `wasm`, `php`, `scss`, `sass`, `scala`, `sol`, `v`, `vue`, `nut`, `svelte`, `toml`, `vala`, `nu`, `pl`, `rkt`, `less`, `m`, `nim`, `gml`, `gleam`, `hs`, `hx`, `jl`, `dart`, `db`, `d`, `ex`, `exs`, `elm`, `erl`, `fnl`, `f90`, `fs`, `asm`, `zig`, `clj`.
+- Unknown extensions fall back to **Idle** state with the editor icon.
 - Live updates on buffer switch (`BufEnter`, `BufWinEnter`), debounced by 800ms to avoid spamming the Gateway.
 - Optional **Open Repository** button when inside a git repo with an `origin` remote.
 - Auto-installs the `ws` dependency via `npm install` on first load.
@@ -37,17 +38,17 @@ Neovim Discord Rich Presence, optimized for **Termux / Linux**. Shows the file y
 ## Getting a token and Application ID
 
 1. **User token:** open Discord in a browser → F12 → Network tab → filter `/api` → copy the `authorization` header. That is your token.
-2. **Application ID:** the plugin already defaults to `1557774262285111366`, no change needed unless you create your own app at the [Discord Developer Portal](https://discord.com/developers/applications).
+2. **Application ID:** the plugin defaults to `1557774262285111366`, no change needed unless you create your own app at the [Discord Developer Portal](https://discord.com/developers/applications).
 
 ## Installation
 
-### lazy.nvim (recommended)
+### lazy.nvim
 
 ```lua
 {
   "g-huy128/termux-presence.nvim",
   config = function()
-    require("termuxcord").setup({
+    require("termux-presence").setup({
       token = "your-token",
     })
   end,
@@ -63,14 +64,14 @@ return {
   "g-huy128/termux-presence.nvim",
   event = "VeryLazy",
   config = function()
-    require("termuxcord").setup({
+    require("termux-presence").setup({
       token = os.getenv("DISCORD_TOKEN"),
     })
   end,
 }
 ```
 
-Then restart Neovim or run `:Lazy sync`. Never hardcode your token in the file — export it first:
+Then restart Neovim or run `:Lazy sync`. Never hardcode your token — export it first:
 
 ```bash
 export DISCORD_TOKEN="your-token"
@@ -82,7 +83,7 @@ export DISCORD_TOKEN="your-token"
 use({
   "g-huy128/termux-presence.nvim",
   config = function()
-    require("termuxcord").setup({ token = "your-token" })
+    require("termux-presence").setup({ token = "your-token" })
   end,
 })
 ```
@@ -95,29 +96,27 @@ Plug 'g-huy128/termux-presence.nvim'
 
 ```lua
 -- in init.lua, after plug#end()
-require("termuxcord").setup({ token = "your-token" })
+require("termux-presence").setup({ token = "your-token" })
 ```
 
-On first run, the plugin calls `npm install` inside `lua/termuxcord/` to install `ws` if `node_modules/ws` is missing.
+On first run, the plugin calls `npm install` inside `lua/termux-presence/` to install `ws` if `node_modules/ws` is missing.
 
 ## Configuration
 
-Full configuration with default values:
-
 ```lua
-require("termuxcord").setup({
-  token = "your-token",               -- required, plugin stops with a warning if empty
-  title = "Neovim",                   -- activity name (field `name`)
-  state = "Workspace %w",          -- bottom line, supports %f (file) and %w (workspace)
-  details = "Editing %f",             -- top line, supports %f and %w
+require("termux-presence").setup({
+  token = "your-token",
+  title = "Neovim",
+  state = "Workspace %w",
+  details = "Editing %f",
   application_id = "1557774262285111366",
   repo_button_text = "Open Repository",
-  show_repo_button = false,           -- true to show the repo button when in git + origin remote exists
-  status = "online",                  -- online | idle | dnd | invisible
-  images = nil,                       -- custom assets, see below (takes precedence over idle_image/idle_text)
-  idle_image = "1558033511355519086",   -- asset id for idle state
-  idle_text = "Idle",                 -- text shown when idle
-  idle_state = " ",                   -- state line when idle
+  show_repo_button = false,
+  status = "online",
+  images = nil,
+  idle_image = "1558428733793108059",
+  idle_text = "Idle",
+  idle_state = " ",
 })
 ```
 
@@ -130,50 +129,56 @@ require("termuxcord").setup({
 | `state` | `string` | `"Workspace %w"` | Bottom line. `%f` = filename (`%:t`), `%w` = cwd basename (`:t`). Replaced by `idle_state` when idle. |
 | `details` | `string` | `"Editing %f"` | Top line. Same placeholders. Replaced by `"Idle"` when idle. |
 | `application_id` | `string` | `"1557774262285111366"` | App that hosts the image assets. |
-| `show_repo_button` | `boolean` | `false` | Show the repo button. Only appears when `isGitRepository(cwd)` and `[remote "origin"]` is found in `.git/config`. |
+| `show_repo_button` | `boolean` | `false` | Show the repo button when in a git repo with an `origin` remote. |
 | `repo_button_text` | `string` | `"Open Repository"` | Button label. |
 | `status` | `string` | `"online"` | `online`, `idle`, `dnd`, `invisible`. Invalid values fall back to `online`. `idle` sends `afk=true`, `since=now`. |
-| `images` | `table` | `nil` | Custom assets: `{ editor = "id", idle = "id", idle_text = "...", languages = { py = "id", ... } }`. |
-| `idle_image` | `string` | `"1558033511355519086"` | Fallback when `images.idle` is unset. |
-| `idle_text` | `string` | `"Idle"` | Fallback when `images.idle_text` is unset. |
-| `idle_state` | `string` | `" "` | State line when the file matches no known language. |
+| `images` | `table` | `nil` | Custom assets, see [Custom language icons](#custom-language-icons). Takes precedence over `idle_image`/`idle_text`. |
+| `idle_image` | `string` | `"1558428733793108059"` | Fallback asset id when `images.idle` is unset. |
+| `idle_text` | `string` | `"Idle"` | Text shown when idle. |
+| `idle_state` | `string` | `" "` | State line when idle. |
 
 ### Custom language icons
 
 ```lua
-require("termuxcord").setup({
+require("termux-presence").setup({
   token = "your-token",
   show_repo_button = true,
   status = "online",
   images = {
-    editor = "1558027697798516737", -- small_image
-    idle = "1558033511355519086",
+    editor = "1558027697798516737",
+    idle = "1558428733793108059",
     idle_text = "Taking a break",
     languages = {
-      py = "1558002783637082112",
-      lua = "1558019297312505927",
-      -- key = lowercase file extension, value = asset id
+      py = "1558427155808124989",
+      lua = "1558404931420028928",
     },
   },
 })
 ```
 
-Built-in languages: `py`, `lua`, `css`, `html`, `c`, `js`. Any other extension uses `idle` as `large_image` and `editor` as `small_image` (`small_text = "Neovim"`, `large_text` = idle text or uppercased extension).
+The `images` table:
+
+| Key | Type | Description |
+| --- | ---- | ----------- |
+| `editor` | `string` | `small_image` asset id shown on all activities. |
+| `idle` | `string` | `large_image` asset id for unknown file types. |
+| `idle_text` | `string` | `large_text` for unknown file types. |
+| `languages` | `table` | Map of lowercase file extension to asset id. |
 
 ### Sample configs
 
-Minimal (just works):
+**Minimal (just works):**
 
 ```lua
-require("termuxcord").setup({
+require("termux-presence").setup({
   token = os.getenv("DISCORD_TOKEN"),
 })
 ```
 
-Termux style with repo button:
+**Termux style with repo button:**
 
 ```lua
-require("termuxcord").setup({
+require("termux-presence").setup({
   token = os.getenv("DISCORD_TOKEN"),
   title = "Termux",
   state = "Workspace %w",
@@ -182,10 +187,10 @@ require("termuxcord").setup({
 })
 ```
 
-Do-not-disturb while coding:
+**Do-not-disturb while coding:**
 
 ```lua
-require("termuxcord").setup({
+require("termux-presence").setup({
   token = os.getenv("DISCORD_TOKEN"),
   status = "dnd",
   idle_text = "Taking a break",
@@ -197,7 +202,7 @@ require("termuxcord").setup({
 
 ```
 init.lua (setup)
-  → writes temp JSON: stdpath("cache")/termuxcord_<pid>.json
+  → writes temp JSON: stdpath("cache")/termux-presence_<pid>.json
   → jobstart: node rpc.js '<tmp>'
       → rpc.js reads config once, connects to Gateway, sends IDENTIFY (op 2)
       → Gateway replies HELLO (op 10) → heartbeat loop (op 1)
@@ -215,29 +220,31 @@ init.lua (setup)
 ```
 termux-presence.nvim/
 ├── README.md
-├── LICENSE                  # MIT
-├── .luarc.json               # disables param-type-mismatch diagnostic
-├── .gitignore                # node_modules, *.log, *.lock
-└── lua/termuxcord/
-    ├── init.lua              # entry point: setup(), config, node jobstart, autocmds
-    ├── rpc.js                # gateway client: identify/heartbeat/presence/reconnect/stdin
-    ├── utils.js              # isGitRepository(), getGitRootDir(), getGitRemoteUrl()
-    ├── package.json          # dependencies: ws ^8.18.0
-    └── node_modules/ws/      # auto-installed when missing (not committed)
+├── LICENSE
+├── .luarc.json
+├── .gitignore
+└── lua/termux-presence/
+    ├── init.lua
+    ├── rpc.js
+    ├── utils.js
+    ├── package.json
+    ├── package-lock.json
+    └── node_modules/        # auto-installed when missing (not committed)
 ```
 
 | File | Role |
 | ---- | ---- |
-| `init.lua` | `M.setup()`, `M._read_config()`, `M._write_temp_config()`, `M._ensure_node()`, `M._push_update()`, `M._schedule_update()`, `install_node_dependencies()` |
-| `rpc.js` | `resolveAssets()`, `buildPresence()`, `connect()/onOpen/onClose/onError/onMessage`, `sendIdentify()`, `sendUpdatePresence()`, `clearPresence()`, `stdin` loop |
-| `utils.js` | Walks up from `cwd` to find `.git`, parses `url = ...` under `[remote "origin"]` |
+| `init.lua` | Entry point: `M.setup()`, config management, node jobstart, autocmds |
+| `rpc.js` | Gateway client: identify/heartbeat/presence/reconnect/stdin loop |
+| `utils.js` | Git repository and remote URL helpers |
+| `package.json` | Dependencies: `ws ^8.18.0` |
 
 ## Troubleshooting
 
 | Symptom | Cause / fix |
 | ------- | ----------- |
-| `[termuxcord] No token provided` | No `token` passed to `setup()`. |
-| `[termuxcord] Failed to write temp config` | Can't write to `stdpath("cache")`. Check directory permissions. |
+| `[termux-presence] No token provided` | No `token` passed to `setup()`. |
+| `[termux-presence] Failed to write temp config` | Can't write to `stdpath("cache")`. Check directory permissions. |
 | `[D-RPC] No token` (node log) | Temp JSON has no token — recheck your config. |
 | `[D-RPC] Cannot update presence: not connected` | Gateway not OPEN (offline / bad token / rate-limited). The auto-reconnect will retry. |
 | No images | Wrong `application_id` or wrong custom asset id. |
@@ -247,8 +254,8 @@ termux-presence.nvim/
 Quick debug:
 
 ```vim
-:lua print(vim.inspect(require("termuxcord").config))
-:lua print(require("termuxcord")._node_process_id)
+:lua print(vim.inspect(require("termux-presence").config))
+:lua print(require("termux-presence")._node_process_id)
 ```
 
 ## Security warning
@@ -256,7 +263,7 @@ Quick debug:
 **This plugin uses a user token + Gateway WebSocket, which violates Discord's Terms of Service.** Your account may be suspended or penalized. Never commit your token to git — use an environment variable instead:
 
 ```lua
-require("termuxcord").setup({ token = os.getenv("DISCORD_TOKEN") })
+require("termux-presence").setup({ token = os.getenv("DISCORD_TOKEN") })
 ```
 
 ## Contributing
@@ -265,4 +272,4 @@ Open issues / PRs at [g-huy128/termux-presence.nvim](https://github.com/g-huy128
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Copyright (c) 2024 Filipe Souza.
+MIT — see [LICENSE](LICENSE).

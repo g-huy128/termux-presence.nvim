@@ -3,14 +3,14 @@ local M = {}
 M.config = {
   token = nil,
   title = "Neovim",
-  state = "Workspace %w",
+  state = "Workspace: %w",
   details = "Editing %f",
   application_id = "1557774262285111366",
   repo_button_text = "Open Repository",
   show_repo_button = false,
   status = "online",
   images = nil,
-  idle_image = "1558033511355519086",
+  idle_image = "1558428733793108059",
   idle_text = "Idle",
   idle_state = " ",
 }
@@ -50,7 +50,7 @@ end
 function M._write_temp_config(cfg)
   local cache = vim.fn.stdpath("cache")
   vim.fn.mkdir(cache, "p")
-  local tmp = cache .. "/termuxcord_" .. vim.fn.getpid() .. ".json"
+  local tmp = cache .. "/termux-presence_" .. vim.fn.getpid() .. ".json"
   local fh = io.open(tmp, "w")
   if not fh then return nil end
   fh:write(vim.json.encode(cfg))
@@ -65,7 +65,7 @@ function M._ensure_node()
   local cfg = M._read_config()
   local tmp = M._write_temp_config(cfg)
   if not tmp then
-    print("[termuxcord] Failed to write temp config.")
+    print("[termux-presence] Failed to write temp config.")
     return nil
   end
 
@@ -106,14 +106,14 @@ local function install_node_dependencies()
   if vim.fn.isdirectory(dir .. "node_modules/ws") == 1 then
     return
   end
-  print("[termuxcord] Installing Node.js dependencies (ws)...")
+  print("[termux-presence] Installing Node.js dependencies (ws)...")
   vim.fn.jobstart("npm install", {
     cwd = dir,
     on_exit = function(_, code)
       if code == 0 then
-        print("[termuxcord] Node.js dependencies installed successfully.")
+        print("[termux-presence] Node.js dependencies installed successfully.")
       else
-        print("[termuxcord] Failed to install Node.js dependencies.")
+        print("[termux-presence] Failed to install Node.js dependencies.")
       end
     end,
   })
@@ -126,7 +126,7 @@ function M.setup(_config)
   install_node_dependencies()
 
   if not M.config.token or M.config.token == "" then
-    print("[termuxcord] No token provided. Please set 'token' in your config.")
+    print("[termux-presence] No token provided. Please set 'token' in your config.")
     return
   end
 
@@ -134,7 +134,7 @@ function M.setup(_config)
   M._ensure_node()
 
   vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-    group = vim.api.nvim_create_augroup("Termuxcord", { clear = true }),
+    group = vim.api.nvim_create_augroup("TermuxPresence", { clear = true }),
     pattern = "*",
     callback = function()
       M._schedule_update()
@@ -142,7 +142,7 @@ function M.setup(_config)
   })
 
   vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
-    group = vim.api.nvim_create_augroup("TermuxcordLeave", { clear = true }),
+    group = vim.api.nvim_create_augroup("TermuxPresenceLeave", { clear = true }),
     callback = function()
       if M._timer then
         pcall(function() M._timer:stop() end)
