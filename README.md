@@ -21,7 +21,7 @@ Built on the Discord Gateway WebSocket (`wss://gateway.discord.gg/?v=10`) via a 
 ## Features
 
 - Shows the current **filename** (`%f`) and **workspace** (`%w`) in your Discord activity.
-- Automatic language icons by file extension. Built-in languages: `py`, `lua`, `luau`, `css`, `html`, `c`, `js`, `md`, `json`, `txt`, `sh`, `bat`, `bash`, `ts`, `tsx`, `jsx`, `rb`, `yaml`, `yml`, `cpp`, `cs`, `rs`, `ml`, `mli`, `swift`, `R`, `kt`, `kts`, `go`, `java`, `wasm`, `php`, `scss`, `sass`, `scala`, `sol`, `v`, `vue`, `nut`, `svelte`, `toml`, `vala`, `nu`, `pl`, `rkt`, `less`, `m`, `nim`, `gml`, `gleam`, `hs`, `hx`, `jl`, `dart`, `db`, `d`, `ex`, `exs`, `elm`, `erl`, `fnl`, `f90`, `fs`, `asm`, `zig`, `clj`.
+- Automatic 60+ language icons by file extension. 
 - Unknown extensions fall back to **Idle** state with the editor icon.
 - Live updates on buffer switch (`BufEnter`, `BufWinEnter`), debounced by 800ms to avoid spamming the Gateway.
 - Optional **Open Repository** button when inside a git repo with an `origin` remote.
@@ -50,22 +50,6 @@ Built on the Discord Gateway WebSocket (`wss://gateway.discord.gg/?v=10`) via a 
   config = function()
     require("termux-presence").setup({
       token = "your-token",
-    })
-  end,
-}
-```
-
-### LazyVim
-
-Create `lua/plugins/termux-presence.lua` in your LazyVim config:
-
-```lua
-return {
-  "g-huy128/termux-presence.nvim",
-  event = "VeryLazy",
-  config = function()
-    require("termux-presence").setup({
-      token = os.getenv("DISCORD_TOKEN"),
     })
   end,
 }
