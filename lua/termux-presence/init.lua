@@ -10,7 +10,7 @@ M.config = {
   show_repo_button = false,
   status = "online",
   images = nil,
-  idle_image = "1558428733793108059",
+  idle_image = "1558808644600996000",
   idle_text = "Idle",
   idle_state = " ",
 }
