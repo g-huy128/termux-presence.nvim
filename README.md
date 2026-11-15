@@ -47,6 +47,7 @@ Built on the Discord Gateway WebSocket (`wss://gateway.discord.gg/?v=10`) via a 
 ```lua
 {
   "g-huy128/termux-presence.nvim",
+  event = "VeryLazy",
   config = function()
     require("termux-presence").setup({
       token = "your-token",
